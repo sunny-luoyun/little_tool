@@ -1,6 +1,6 @@
 import subprocess
 
-# 定义 sudo 命令和密码
+# 定义 sudo 命令和密码 是一个
 command = "120712' | sudo -S asitop"
 
 # 运行命令
