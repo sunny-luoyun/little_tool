@@ -1,3 +1,7 @@
+"""处理行为运动学习的数据，按钮1234象限，8个list，结果输出为整理后的数据（正确值，反应时，list）以及归纳每个list的反应时和正确率
+使用方法：在终端运行脚本文件 python sort_behavior.py 将结果文件txt拖入后回车即可得到结果文件。
+"""
+
 import os
 import csv
 from collections import defaultdict
