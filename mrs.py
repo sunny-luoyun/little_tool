@@ -3,6 +3,10 @@ import os
 import pandas as pd
 from datetime import datetime
 
+def clean_path(path: str) -> str:
+    """去除单引号、双引号和多余空格"""
+    return re.sub(r'^["\']|["\']$', '', path).strip()
+
 def extract_lcmodel_ps(ps_file_path, output_excel_path):
     with open(ps_file_path, 'r', encoding='utf-8', errors='ignore') as f:
         text = f.read()
@@ -55,5 +59,6 @@ def extract_lcmodel_ps(ps_file_path, output_excel_path):
 # 示例用法
 if __name__ == "__main__":
     ps_file = input('输入你的ps文件路径')
+    ps_file = clean_path(ps_file)
     excel_file = os.path.join(os.path.dirname(os.path.abspath(ps_file)), "lcmodel_output.xlsx")
     extract_lcmodel_ps(ps_file, excel_file)
