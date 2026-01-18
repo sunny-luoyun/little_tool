@@ -12,9 +12,13 @@ HEADERS = {"User-Agent": "Mozilla/5.0"}
 
 STATE_FILE = "thread_state.json"
 PAGE_SIZE = 30
-MAX_PAGES = 20
-SLEEP_MIN = 5
-SLEEP_MAX = 6
+MAX_PAGES = 10
+SLEEP_MIN = 10
+SLEEP_MAX = 20
+WATCH_AUTHORS = {
+    "flowerdance","听雨",'优嫙','mmmmmmxxxxxww','偶氮二异丁腈','shenshanel','yyxm','q812720069','人间难得几回魂','DLonestar','as_2038','lianpuface',
+    'enjoyzzq02','芬肯施泰因','食草龙','HuaierSS','lucid'
+}
 
 STOP_AFTER_OLD_PAGES = 2  # 连续2页都“明显旧”才停
 
@@ -43,6 +47,14 @@ def parse_threads(html: str):
 
         title = title_a.get_text(strip=True)
         link = BASE + href
+
+        thread_author = ""
+
+        author_span = row.find("span", class_="d-none d-sm-inline-block")
+        if author_span:
+            a = author_span.find("a", class_="ui-link")
+            if a:
+                thread_author = a.get_text(strip=True)
 
         reply_td = row.find("td", class_="text-end")
         reply_cnt = int(reply_td.get_text(strip=True)) if reply_td else 0
@@ -86,11 +98,16 @@ def parse_threads(html: str):
             "last_pid": last_pid,
             "last_time": last_time,
             "last_user": last_user,
+            "thread_author": thread_author,  # ← 新增
             "last_href": BASE + last_href,
         })
 
     return out
 
+def mark_author(author: str) -> str:
+    if author in WATCH_AUTHORS:
+        return "⭐⭐⭐⭐关注作者"
+    return ""
 
 def load_state():
     if not os.path.exists(STATE_FILE):
@@ -159,6 +176,7 @@ def main():
                 "last_time": t["last_time"],
                 "title": t["title"],
                 "link": t["link"],
+                "thread_author": t.get("thread_author", ""),
             }
 
         # ---------- 智能停爬（连续2页旧才停） ----------
@@ -181,19 +199,24 @@ def main():
             new_threads.sort(key=lambda x: x["last_pid"], reverse=True)
             print(f"🆕 新帖子：{len(new_threads)}")
             for t in new_threads:
-                print(f"- pid={t['last_pid']} | {t['last_time']} | {t['title']} | {t['last_user']} | 回复 {t['reply']}")
+                mark = mark_author(t.get("thread_author", ""))
+                print(
+                    f"- pid={t['last_pid']} | {t['last_time']} | {t['title']} "
+                    f"| 作者: {t.get('thread_author', '')} {mark} "
+                )
                 print(f"  {t['link']}")
-                print(f"  last: {t['last_href']}")
-            print()
 
         if updated_threads:
             updated_threads.sort(key=lambda x: x["last_pid"], reverse=True)
             print(f"🔥 更新的帖子：{len(updated_threads)}")
             for t in updated_threads:
                 prev = state["threads"].get(t["thread_id"], {})
-                print(f"- pid {prev.get('last_pid','?')} -> {t['last_pid']} | {prev.get('last_time','')} -> {t['last_time']} | {t['title']}")
+                mark = mark_author(t.get("thread_author", ""))
+                print(
+                    f"- pid={t['last_pid']} | {t['last_time']} | {t['title']} "
+                    f"| 作者: {t.get('thread_author', '')} {mark} "
+                )
                 print(f"  {t['link']}")
-                print(f"  last: {t['last_href']}")
 
     state["max_seen_pid"] = newest_pid_this_run
     save_state(state)
