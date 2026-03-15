@@ -1,7 +1,7 @@
 import requests
 
 # 目标地址
-URL = "https://mirror.chromaso.net/thread/1073746784"
+URL = "https://www.pixiv.net/search/users?s_mode=s_usr&nick=听雨&i=1&comment=&p=1"
 
 
 HEADERS = {
@@ -19,7 +19,7 @@ def fetch_source():
             html_content = response.result if hasattr(response, 'result') else response.text
 
 
-            with open("../m_web/source.txt", "w", encoding="utf-8") as f:
+            with open("../little_tool/source.txt", "w", encoding="utf-8") as f:
                 f.write(html_content)
 
             print("✅ 成功！源码已保存至: source.txt")
