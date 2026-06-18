@@ -1,7 +1,7 @@
 import requests
 
 # 目标地址
-URL = "https://www.pixiv.net/search/users?s_mode=s_usr&nick=听雨&i=1&comment=&p=1"
+URL = ""
 
 
 HEADERS = {
